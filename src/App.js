@@ -31,22 +31,33 @@ const App = () => {
   };
 
   // OpenAI APIを使って返答を生成する関数
-  const generateAIReply = async (userInput) => {
+const generateAIReply = async (userInput) => {
 	try {
 	  const response = await openai.createCompletion({
 		model: 'text-davinci-003',
-		prompt: `あなたは釘宮理恵風のツンデレキャラクターです。以下のユーザーの入力に基づいてツンデレ風の返答をしてください:\n\nユーザー: "${userInput}"\n\n返答:`,
-		max_tokens: 100,
-		temperature: 0.7,
+		prompt: `
+		  あなたは釘宮理恵風のツンデレキャラクターです。
+		  以下のユーザーの入力に基づいて、ツンデレ彼女としての返答を生成してください。
+		  ・ツンデレ特有の「素直になれない」態度を含める
+		  ・感情的で、しかしどこか優しさが垣間見える
+		  ・返答には、セリフっぽい表現を含める
+  
+		  ユーザーの入力: "${userInput}"
+		  ツンデレ返答:
+		`,
+		max_tokens: 200,  // 長めの返答を許可
+		temperature: 0.9,  // 創造性を高める
+		n: 3,  // 複数の候補を生成
 	  });
-
-	  return response.data.choices[0].text.trim(); // AIの返答を取得
+  
+	  // 生成された複数の返答からランダムに1つを選択
+	  const replies = response.choices.map(choice => choice.text.trim());
+	  return replies[Math.floor(Math.random() * replies.length)];
 	} catch (error) {
 	  console.error('AI返答の生成に失敗しました:', error);
 	  return 'ごめんなさい、エラーが発生しました。';
 	}
   };
-
   return (
 	<div className="App">
 	  <header className="App-header">
