@@ -27,7 +27,7 @@ const App = () => {
   };
 
   // OpenAI APIを使って返答を生成する関数
-  const generateAIReply = async (userInput) => {
+const generateAIReply = async (userInput) => {
 	try {
 	  const response = await openai.createCompletion({
 		model: 'text-davinci-003',
@@ -41,14 +41,13 @@ const App = () => {
 		max_tokens: 150,
 		temperature: 0.8,
 	  });
-
-	  return response.data.choices[0].text.trim();
+  
+	  return response.data.choices[0].text.trim(); // 生成された返答を取得
 	} catch (error) {
-	  console.error('APIリクエストに失敗しました:', error);
-	  return 'ごめんなさい、エラーが発生しました。';
+	  console.error('APIリクエスト失敗:', error); // 詳細なエラーログを表示
+	  return `ごめんなさい、エラーが発生しました。詳細: ${error.message}`;
 	}
   };
-
   return (
 	<div className="App">
 	  <header className="App-header">
