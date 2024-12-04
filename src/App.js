@@ -1,42 +1,49 @@
 import React, { useState } from 'react';
-import './App.css';
-import { Configuration, OpenAIApi } from 'openai';  // OpenAI SDKをインポート
+import './App.css'; // スタイルシートをインポート
+import { Configuration, OpenAIApi } from 'openai';
+
+// OpenAI APIの設定
+const openai = new OpenAIApi(
+  new Configuration({
+	apiKey: process.env.REACT_APP_OPENAI_API_KEY, // 環境変数からAPIキーを取得
+  })
+);
 
 const App = () => {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState([]); // メッセージの状態
+  const [input, setInput] = useState(''); // ユーザー入力の状態
 
-  // OpenAIの設定
-  const openai = new OpenAIApi(new Configuration({
-	apiKey: process.env.REACT_APP_OPENAI_API_KEY,  // 環境変数からAPIキーを取得
-  }));
-
-  // 送信ボタンが押されたときの処理
+  // メッセージを送信する関数
   const handleSend = async () => {
+	if (!input.trim()) return; // 空白の入力を無視
+
+	// ユーザーのメッセージを追加
 	const userMessage = { text: input, sender: 'user' };
-	setMessages([...messages, userMessage]);  // ユーザーのメッセージを追加
+	setMessages([...messages, userMessage]);
+	setInput(''); // 入力フィールドをリセット
 
-	setInput('');  // 入力フィールドをリセット
-
-	// OpenAI APIを呼び出して返答を生成
+	// OpenAI APIを使ってAIの返答を生成
 	const reply = await generateAIReply(input);
-	setMessages((prev) => [...prev, { text: reply, sender: 'ai' }]);  // AIの返答を追加
+	const aiMessage = { text: reply, sender: 'ai' };
+
+	// AIのメッセージを追加
+	setMessages((prevMessages) => [...prevMessages, aiMessage]);
   };
 
-  // OpenAI APIを呼び出して返答を生成する関数
+  // OpenAI APIを使って返答を生成する関数
   const generateAIReply = async (userInput) => {
 	try {
 	  const response = await openai.createCompletion({
-		model: 'text-davinci-003',  // 使用するGPT-3モデル
-		prompt: `釘宮理恵風に、ツンデレで拗ねたりしながら次の入力に対して返答をしてください: "${userInput}"`,
-		max_tokens: 150,  // 返答の最大トークン数
-		temperature: 1.0,  // 返答のランダム性を設定（0.0～1.0）
+		model: 'text-davinci-003',
+		prompt: `あなたは釘宮理恵風のツンデレキャラクターです。以下のユーザーの入力に基づいてツンデレ風の返答をしてください:\n\nユーザー: "${userInput}"\n\n返答:`,
+		max_tokens: 100,
+		temperature: 0.7,
 	  });
 
-	  return response.data.choices[0].text.trim();  // 返答を返す
+	  return response.data.choices[0].text.trim(); // AIの返答を取得
 	} catch (error) {
-	  console.error("AI返答の生成に失敗しました:", error);
-	  return "ごめんなさい、エラーが発生しました。";
+	  console.error('AI返答の生成に失敗しました:', error);
+	  return 'ごめんなさい、エラーが発生しました。';
 	}
   };
 
@@ -44,7 +51,7 @@ const App = () => {
 	<div className="App">
 	  <header className="App-header">
 		<h1>釘宮理恵チャット</h1>
-		<p>ツンデレ彼女です</p>
+		<p className="App-subtitle">ツンデレ彼女です</p>
 	  </header>
 	  <div className="chat-window">
 		{messages.map((msg, index) => (
@@ -57,7 +64,7 @@ const App = () => {
 		<input
 		  type="text"
 		  value={input}
-		  onChange={(e) => setInput(e.target.value)}  // ユーザー入力を取得
+		  onChange={(e) => setInput(e.target.value)} // 入力を更新
 		  placeholder="メッセージを入力..."
 		/>
 		<button onClick={handleSend}>送信</button>
