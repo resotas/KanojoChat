@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './App.css';
-import { Configuration, OpenAIApi } from 'openai';
+import { Configuration, OpenAIApi } from 'openai'; // OpenAIライブラリのインポート
 
 // OpenAI APIの設定
 const configuration = new Configuration({
@@ -12,7 +12,6 @@ const App = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
 
-  // ユーザーの入力を送信する関数
   const handleSend = async () => {
 	if (!input.trim()) return;
 
@@ -26,8 +25,7 @@ const App = () => {
 	setMessages((prevMessages) => [...prevMessages, aiMessage]);
   };
 
-  // OpenAI APIを使って返答を生成する関数
-const generateAIReply = async (userInput) => {
+  const generateAIReply = async (userInput) => {
 	try {
 	  const response = await openai.createCompletion({
 		model: 'text-davinci-003',
@@ -41,13 +39,14 @@ const generateAIReply = async (userInput) => {
 		max_tokens: 150,
 		temperature: 0.8,
 	  });
-  
-	  return response.data.choices[0].text.trim(); // 生成された返答を取得
+
+	  return response.data.choices[0].text.trim();
 	} catch (error) {
-	  console.error('APIリクエスト失敗:', error); // 詳細なエラーログを表示
-	  return `ごめんなさい、エラーが発生しました。詳細: ${error.message}`;
+	  console.error('APIリクエストに失敗しました:', error);
+	  return 'ごめんなさい、エラーが発生しました。';
 	}
   };
+
   return (
 	<div className="App">
 	  <header className="App-header">
