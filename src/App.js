@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import './App.css';
-import openai from 'openai'; // デフォルトエクスポートを使用
+import { Configuration, OpenAIApi } from 'openai';
 
-openai.apiKey = process.env.REACT_APP_OPENAI_API_KEY; // APIキーを設定
+// OpenAI APIの設定
+const configuration = new Configuration({
+  apiKey: process.env.REACT_APP_OPENAI_API_KEY, // 環境変数からAPIキーを取得
+});
+const openai = new OpenAIApi(configuration);
 
 const App = () => {
   const [messages, setMessages] = useState([]);
@@ -25,17 +29,20 @@ const App = () => {
   // OpenAI APIを使って返答を生成する関数
   const generateAIReply = async (userInput) => {
 	try {
-	  const response = await openai.chat.completions.create({
-		model: 'gpt-3.5-turbo',
-		messages: [
-		  { role: 'system', content: 'あなたは釘宮理恵風のツンデレキャラクターです。' },
-		  { role: 'user', content: userInput },
-		],
+	  const response = await openai.createCompletion({
+		model: 'text-davinci-003',
+		prompt: `
+		  あなたは釘宮理恵風のツンデレキャラクターです。
+		  以下のユーザーの入力に基づいてツンデレ風の返答を生成してください:
+		  
+		  ユーザー: "${userInput}"
+		  ツンデレ返答:
+		`,
 		max_tokens: 150,
 		temperature: 0.8,
 	  });
 
-	  return response.choices[0].message.content;
+	  return response.data.choices[0].text.trim();
 	} catch (error) {
 	  console.error('APIリクエストに失敗しました:', error);
 	  return 'ごめんなさい、エラーが発生しました。';
