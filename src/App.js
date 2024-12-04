@@ -28,9 +28,9 @@ const App = () => {
 	try {
 	  const response = await openai.createCompletion({
 		model: 'text-davinci-003',  // 使用するGPT-3モデル
-		prompt: `釘宮理恵風に、ツンデレで次の入力に対して返答をしてください: "${userInput}"`,
+		prompt: `釘宮理恵風に、ツンデレで拗ねたりしながら次の入力に対して返答をしてください: "${userInput}"`,
 		max_tokens: 150,  // 返答の最大トークン数
-		temperature: 0.7,  // 返答のランダム性を設定（0.0～1.0）
+		temperature: 1.0,  // 返答のランダム性を設定（0.0～1.0）
 	  });
 
 	  return response.data.choices[0].text.trim();  // 返答を返す
